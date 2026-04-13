@@ -1,50 +1,38 @@
-# Job Application Agent
+# 🚀 AI Career Agent
 
-An AI-powered agent that automates the job application process by parsing resumes and job descriptions, researching companies, tailoring resumes, writing cover letters, and packaging outputs.
+An intelligent, multi-agent orchestration system that automates the tedious parts of job applications. By leveraging **Groq (Llama 3.3-70B)** and **Tavily Search**, this agent researches companies, parses complex documents, and generates high-impact tailored resumes and cover letters in seconds.
 
-## Setup
+## 🌟 Key Features
 
-1. Install dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
+- **Automated Company Research**: Real-time web scraping to identify company culture, tech stacks, and recent initiatives.
+- **Smart Resume Tailoring**: Dynamically re-aligns your experience with specific Job Description (JD) keywords while maintaining factual integrity.
+- **Bespoke Cover Letters**: Generates personalized narratives that connect your specific achievements to the company's mission.
+- **Multi-Format Parsing**: Robust extraction from PDF, DOCX, and TXT files using advanced text sanitization.
+- **Instant Packaging**: Automatically generates and downloads professional `.docx` versions of all tailored materials.
 
-2. Set up API keys in `.env`:
-   - Get Gemini API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
-   - Get Tavily API key from https://tavily.com/
-   - Replace the placeholders in `.env` with your actual keys.
+## 🛠️ Tech Stack
 
-3. The project is configured to use `gemini-2.5-flash` for all model calls.
+- **LLM Orchestration**: [Groq](https://groq.com/) (using `llama-3.3-70b-versatile`)
+- **Intelligence**: [Tavily AI](https://tavily.com/) (Real-time Search)
+- **Backend**: Python / Flask
+- **Frontend**: Tailwind CSS / Vanilla JS (Glassmorphism UI)
+- **Document Processing**: `pdfplumber`, `python-docx`
 
-4. Run the web application:
-   ```
-   python web.py
-   ```
-   Then open http://127.0.0.1:5000 in your browser.
+## 📂 Project Structure
 
-## Features
-
-- Upload resume in PDF, DOCX, or TXT format
-- Enter job description as text or URL
-- AI-powered company research
-- Resume tailoring
-- Cover letter generation
-- Download generated documents
-
-## Project Structure
-
-- `web.py`: Flask web application
-- `agents/`: Individual agent modules
-- `tools/`: Utility tools
-- `prompts/`: LLM prompts
-- `outputs/`: Generated files
-- `templates/`: HTML templates
-- `static/`: CSS and JS files
-
-## Phases
-
-1. Parse resume and JD
-2. Research company
-3. Tailor resume
-4. Write cover letter
-5. Package outputs
+```text
+├── agents/
+│   ├── parser.py          # Extracts structured JSON from Resume/JD
+│   ├── researcher.py      # Conducts real-time company web research
+│   ├── resume_tailor.py   # Rewrites experience bullets for JD alignment
+│   ├── cover_letter.py    # Drafts personalized cover letters
+│   └── packager.py        # Orchestrates .docx file generation
+├── tools/
+│   ├── pdf_reader.py      # Sanitized text extraction from documents
+│   ├── docx_writer.py     # Professional document formatting
+│   └── web_search.py      # Tavily search implementation
+├── prompts/               # Engineering-optimized LLM instructions
+├── static/                # Modern UI assets (CSS/JS)
+├── templates/             # Flask HTML templates
+├── config.py              # Environment and model configuration
+└── web.py                 # Flask Application Entry Point

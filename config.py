@@ -13,4 +13,4 @@ if not TAVILY_API_KEY or TAVILY_API_KEY == "your_tavily_key_here":
     raise ValueError("Please set a valid TAVILY_API_KEY in .env")
 
 # Model settings
-GEMINI_MODEL = "gemini-2.5-flash"  # Use Gemini Flash 2.5 for all LLM calls
+GEMINI_MODEL = "gemini-2.5-flash"

@@ -1,7 +1,9 @@
 import json
 import requests
+import time
 from bs4 import BeautifulSoup
 import google.genai as genai
+from google.api_core import exceptions
 import config
 from tools.pdf_reader import extract_text_from_file
 
@@ -30,19 +32,25 @@ def parse_resume_and_jd(resume_path, jd_input):
 
     prompt = prompt_template.format(resume_text=resume_text, jd_text=jd_text)
 
-    # Call Gemini
-    response = client.models.generate_content(
-        model=config.GEMINI_MODEL,
-        contents=prompt
-    )
-    result_text = response.text.strip()
+    # Call Gemini with Retry Logic
+    for attempt in range(3):
+        try:
+            response = client.models.generate_content(
+                model=config.GEMINI_MODEL,
+                contents=prompt
+            )
+            result_text = response.text.strip()
+            
+            # Clean up potential markdown formatting if present
+            if result_text.startswith("```json"):
+                result_text = result_text.replace("```json", "").replace("```", "").strip()
 
-    # Parse JSON (assuming it returns JSON)
-    try:
-        result = json.loads(result_text)
-    except json.JSONDecodeError:
-        # If not JSON, try to extract
-        # For simplicity, assume it's JSON
-        raise ValueError("Failed to parse JSON from response")
+            return json.loads(result_text)
 
-    return result
+        except (exceptions.ServiceUnavailable, exceptions.InternalServerError):
+            if attempt < 2:
+                time.sleep(5)  # Wait 5 seconds before retrying
+                continue
+            raise
+        except json.JSONDecodeError:
+            raise ValueError("Failed to parse valid JSON from the AI response.")

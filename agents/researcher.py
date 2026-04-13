@@ -1,4 +1,6 @@
 import google.genai as genai
+from google.api_core import exceptions
+import time
 import config
 from tools.web_search import search_web
 
@@ -16,9 +18,12 @@ def research_company(company_name, job_title):
 
     all_snippets = []
     for query in queries:
-        results = search_web(query, max_results=3)
-        for result in results:
-            all_snippets.append(result['content'])
+        try:
+            results = search_web(query, max_results=3)
+            for result in results:
+                all_snippets.append(result['content'])
+        except Exception:
+            continue  # If search fails, continue with other queries
 
     research_snippets = "\n\n".join(all_snippets)
 
@@ -28,9 +33,16 @@ def research_company(company_name, job_title):
 
     prompt = prompt_template.format(company_name=company_name, job_title=job_title, research_snippets=research_snippets)
 
-    # Call Gemini
-    response = client.models.generate_content(
-        model=config.GEMINI_MODEL,
-        contents=prompt
-    )
-    return response.text
+    # Call Gemini with Retry Logic
+    for attempt in range(3):
+        try:
+            response = client.models.generate_content(
+                model=config.GEMINI_MODEL,
+                contents=prompt
+            )
+            return response.text
+        except (exceptions.ServiceUnavailable, exceptions.InternalServerError):
+            if attempt < 2:
+                time.sleep(5)  # Wait 5 seconds before retrying
+                continue
+            raise

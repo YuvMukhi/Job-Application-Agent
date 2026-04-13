@@ -9,6 +9,11 @@ from agents.packager import package_outputs
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
+# Ensure the outputs directory exists when the app starts
+OUTPUTS_DIR = os.path.join(app.root_path, 'outputs')
+if not os.path.exists(OUTPUTS_DIR):
+    os.makedirs(OUTPUTS_DIR)
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -29,22 +34,29 @@ def process():
         resume_path = os.path.join(temp_dir, resume_file.filename)
         resume_file.save(resume_path)
 
-        # Process
+        # Process through agents
         context = parse_resume_and_jd(resume_path, jd_input)
-        context['company_brief'] = research_company(context['job_description']['company_name'], context['job_description']['job_title'])
+        
+        # Extract company name early for UI/download consistency
+        company_name = context.get('job_description', {}).get('company_name', 'Company')
+        
+        context['company_brief'] = research_company(company_name, context['job_description']['job_title'])
         context['tailored_resume'] = tailor_resume(context)
         context['cover_letter'] = write_cover_letter(context)
+        
+        # This function generates the .docx files in the 'outputs' folder
         package_outputs(context)
 
         # Clean up temp
         os.remove(resume_path)
         os.rmdir(temp_dir)
 
-        # Return results
+        # Return results including the company_name for the frontend to build download links
         return jsonify({
             'company_brief': context['company_brief'],
             'tailored_resume': context['tailored_resume'],
-            'cover_letter': context['cover_letter']
+            'cover_letter': context['cover_letter'],
+            'company_name': company_name
         })
 
     except Exception as e:
@@ -52,7 +64,14 @@ def process():
 
 @app.route('/download/<filename>')
 def download(filename):
-    return send_file(os.path.join('outputs', filename), as_attachment=True)
+    # Construct an absolute path to avoid directory issues
+    file_path = os.path.join(OUTPUTS_DIR, filename)
+    
+    if os.path.exists(file_path):
+        return send_file(file_path, as_attachment=True)
+    else:
+        # Return a 404 if the AI failed to generate the specific file
+        return jsonify({'error': f'File {filename} not found.'}), 404
 
 if __name__ == '__main__':
     app.run(debug=True)

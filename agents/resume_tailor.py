@@ -1,17 +1,15 @@
 import json
-import google.genai as genai
+from groq import Groq
 import config
 
-client = genai.Client(api_key=config.GEMINI_API_KEY)
+client = Groq(api_key=config.GROQ_API_KEY)
 
 def tailor_resume(context):
-    """Tailor the resume based on JD."""
     resume_text = json.dumps(context['resume'], indent=2)
     keywords = ', '.join(context['job_description']['keywords'])
     required_skills = ', '.join(context['job_description']['required_skills'])
     responsibilities = '; '.join(context['job_description']['responsibilities'])
 
-    # Load prompt
     with open('prompts/tailor_prompt.txt', 'r') as f:
         prompt_template = f.read()
 
@@ -24,9 +22,8 @@ def tailor_resume(context):
         responsibilities=responsibilities
     )
 
-    # Call Gemini
-    response = client.models.generate_content(
-        model=config.GEMINI_MODEL,
-        contents=prompt
+    completion = client.chat.completions.create(
+        model=config.GROQ_MODEL,
+        messages=[{"role": "user", "content": prompt}]
     )
-    return response.text
+    return completion.choices[0].message.content

@@ -3,14 +3,16 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+# Change these to Groq
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 
-if not GEMINI_API_KEY or GEMINI_API_KEY == "your_gemini_key_here":
-    raise ValueError("Please set a valid GEMINI_API_KEY in .env")
+if not GROQ_API_KEY:
+    raise ValueError("Please set a valid GROQ_API_KEY in .env")
 
-if not TAVILY_API_KEY or TAVILY_API_KEY == "your_tavily_key_here":
+if not TAVILY_API_KEY:
     raise ValueError("Please set a valid TAVILY_API_KEY in .env")
 
 # Model settings
-GEMINI_MODEL = "gemini-2.5-flash"
+# llama-3.3-70b-versatile is a strong choice for complex reasoning
+GROQ_MODEL = "llama-3.3-70b-versatile"

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Application Agent</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Job Application Agent</h1>
+            <p>AI-powered job application assistant</p>
+        </header>
+
+        <form id="applicationForm" enctype="multipart/form-data">
+            <div class="form-section">
+                <h2>Resume Upload</h2>
+                <div class="file-upload">
+                    <input type="file" id="resume" name="resume" accept=".pdf,.docx,.txt" required>
+                    <label for="resume">Choose Resume File (PDF, DOCX, TXT)</label>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Job Description</h2>
+                <textarea id="jd_text" name="jd_text" placeholder="Paste job description text or URL here..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary">Generate Application</button>
+        </form>
+
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Processing your application...</p>
+        </div>
+
+        <div id="results" class="results" style="display: none;">
+            <h2>Generated Application</h2>
+
+            <div class="result-section">
+                <h3>Company Brief</h3>
+                <div id="companyBrief" class="content"></div>
+            </div>
+
+            <div class="result-section">
+                <h3>Tailored Resume</h3>
+                <div id="tailoredResume" class="content"></div>
+            </div>
+
+            <div class="result-section">
+                <h3>Cover Letter</h3>
+                <div id="coverLetter" class="content"></div>
+            </div>
+
+            <div class="downloads">
+                <h3>Download Files</h3>
+                <a href="/download/tailored_resume.docx" class="btn-secondary">Download Resume</a>
+                <a href="/download/cover_letter.docx" class="btn-secondary">Download Cover Letter</a>
+                <a href="/download/company_brief.docx" class="btn-secondary">Download Company Brief</a>
+            </div>
+        </div>
+
+        <div id="error" class="error" style="display: none;">
+            <p id="errorMessage"></p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

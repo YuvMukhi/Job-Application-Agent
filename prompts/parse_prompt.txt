@@ -1,0 +1,35 @@
+Extract structured information from the provided resume and job description. Return only valid JSON with the following structure:
+
+{{
+  "resume": {{
+    "name": "string",
+    "email": "string",
+    "skills": ["array of strings"],
+    "experience": [
+      {{
+        "role": "string",
+        "company": "string",
+        "duration": "string",
+        "bullets": ["array of strings"]
+      }}
+    ],
+    "education": ["array of strings"],
+    "certifications": ["array of strings"]
+  }},
+  "job_description": {{
+    "job_title": "string",
+    "company_name": "string",
+    "required_skills": ["array of strings"],
+    "preferred_skills": ["array of strings"],
+    "keywords": ["array of strings"],
+    "responsibilities": ["array of strings"]
+  }}
+}}
+
+Resume text:
+{resume_text}
+
+Job description text:
+{jd_text}
+
+Return only valid JSON, no explanation, no markdown formatting.

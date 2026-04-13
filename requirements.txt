@@ -1,0 +1,10 @@
+google-genai
+pdfplumber
+tavily-python
+python-docx
+streamlit
+python-dotenv
+requests
+beautifulsoup4
+flask
+python-docx

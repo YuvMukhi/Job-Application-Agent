@@ -1,0 +1,6 @@
+Summarize the key facts about {company_name} relevant to a job applicant for the position of {job_title}. Focus on culture, mission, recent initiatives, tech stack, and why it matters for this role.
+
+Research snippets:
+{research_snippets}
+
+Provide a structured company brief with sections: Overview, Culture & Values, Tech Stack, Recent News, Why It Matters for This Role. Keep it to 300-500 words.

@@ -1,0 +1,18 @@
+Tailor the following resume to align with the job description for {job_title} at {company_name}. 
+
+Original resume:
+{resume_text}
+
+Job description keywords: {keywords}
+Required skills: {required_skills}
+Responsibilities: {responsibilities}
+
+Instructions:
+- Reorder experience bullets to surface the most relevant ones first
+- Reword generic bullets to mirror the JD's language naturally
+- Add any overlooked skills from the resume that match the JD
+- Remove or de-emphasize irrelevant bullets
+- Keep the same factual content — no fabrication
+- Return the tailored resume in structured format with sections: Summary, Experience, Skills, Education
+
+Do not invent any experience, skills, or achievements. Only restructure and rephrase what already exists.

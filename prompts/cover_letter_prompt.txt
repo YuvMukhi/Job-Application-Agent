@@ -1,0 +1,14 @@
+Write a compelling cover letter for {candidate_name} applying to {job_title} at {company_name}.
+
+Context:
+Company brief: {company_brief}
+Tailored resume: {tailored_resume}
+Job responsibilities: {responsibilities}
+
+Structure:
+- Paragraph 1 (Hook): Why this specific company excites the candidate — reference something from the company brief.
+- Paragraph 2 (Fit): Connect 2-3 of the candidate's strongest experiences directly to the JD's key responsibilities.
+- Paragraph 3 (Close): Express enthusiasm, mention availability for an interview, confident sign-off.
+
+Tone: Professional but not stiff, confident but not arrogant, concise (under 350 words).
+Reference the company by name at least twice. Do not use generic phrases. Start with something specific and engaging.

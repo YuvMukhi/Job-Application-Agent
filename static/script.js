@@ -1,63 +1,93 @@
-const form = document.getElementById('applicationForm');
+document.getElementById('applicationForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
 
-if (window.location.protocol === 'file:') {
-    const error = document.getElementById('error');
-    document.getElementById('errorMessage').textContent = 'Please open the site through the Flask server using `python web.py`, not by opening index.html directly.';
-    error.style.display = 'block';
-    form.querySelector('button[type="submit"]').disabled = true;
-} else {
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
+    const formData = new FormData(this);
+    const mainUI = document.getElementById('main-interface');
+    const loading = document.getElementById('loading');
+    const results = document.getElementById('results');
+    const statusText = document.getElementById('status-text');
 
-        const formData = new FormData(this);
+    // UI State Management
+    mainUI.style.display = 'none';
+    loading.style.display = 'block';
 
-        // Show loading
-        document.getElementById('loading').style.display = 'block';
-        document.getElementById('results').style.display = 'none';
-        document.getElementById('error').style.display = 'none';
+    // Simulated status updates
+    const steps = ["Parsing your resume...", "Researching company culture...", "Tailoring experience bullets...", "Writing cover letter..."];
+    let stepIdx = 0;
+    const interval = setInterval(() => {
+        if (stepIdx < steps.length) {
+            statusText.innerText = steps[stepIdx];
+            stepIdx++;
+        }
+    }, 5000);
 
+    // Function to handle the request with a retry for 503 errors
+    async function processApplication(retries = 2) {
         try {
-            const url = `${window.location.origin}/process`;
-            const response = await fetch(url, {
+            const response = await fetch('/process', {
                 method: 'POST',
                 body: formData
             });
 
-            if (!response.ok) {
-                const text = await response.text();
-                throw new Error(`Server error ${response.status}: ${text}`);
+            // Handle 503 Specific Logic
+            if (response.status === 503 && retries > 0) {
+                statusText.innerText = "AI is busy, retrying in 5 seconds...";
+                await new Promise(resolve => setTimeout(resolve, 5000));
+                return processApplication(retries - 1);
             }
 
             const data = await response.json();
-
-            if (data.error) {
-                throw new Error(data.error);
-            }
-
-            // Display results
-            document.getElementById('companyBrief').textContent = data.company_brief;
-            document.getElementById('tailoredResume').textContent = data.tailored_resume;
-            document.getElementById('coverLetter').textContent = data.cover_letter;
-
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('results').style.display = 'block';
+            if (data.error) throw new Error(data.error);
+            return data;
 
         } catch (error) {
-            console.error(error);
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('errorMessage').textContent = error.message;
-            document.getElementById('error').style.display = 'block';
+            throw error;
         }
-    });
-}
+    }
 
-// File upload feedback
+    try {
+        const data = await processApplication();
+        clearInterval(interval);
+
+        // Populate Content
+        document.getElementById('companyBrief').textContent = data.company_brief;
+        document.getElementById('tailoredResume').textContent = data.tailored_resume;
+        document.getElementById('coverLetter').textContent = data.cover_letter;
+
+        /** * FIX FOR DOWNLOAD LINKS:
+         * Your packager.py creates files like 'tailored_resume_Company.docx'.
+         * We extract the company name from the backend response context or 
+         * assume the standard naming used in your download buttons.
+         */
+        const companySuffix = data.company_name ? `_${data.company_name.replace(/\s+/g, '_')}` : '';
+        
+        // Update download links to match the logic in packager.py
+        document.getElementById('dl-resume').href = `/download/tailored_resume${companySuffix}.docx`;
+        document.getElementById('dl-cover').href = `/download/cover_letter${companySuffix}.docx`;
+
+        loading.style.display = 'none';
+        results.style.display = 'block';
+
+    } catch (error) {
+        clearInterval(interval);
+        // User-friendly error message for 503 spikes
+        if (error.message.includes("503") || error.message.includes("UNAVAILABLE")) {
+            alert("The AI service is currently overloaded. Please wait a moment and try again.");
+        } else {
+            alert("Error: " + error.message);
+        }
+        mainUI.style.display = 'block';
+        loading.style.display = 'none';
+    }
+});
+
+// Improved File Upload Visual
 document.getElementById('resume').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-        const label = e.target.nextElementSibling;
-        label.textContent = `Selected: ${file.name}`;
-        label.style.borderColor = '#48bb78';
-        label.style.background = '#f0fff4';
+    const fileName = e.target.files[0]?.name;
+    if (fileName) {
+        const label = this.nextElementSibling;
+        label.innerHTML = `<strong>File Selected:</strong><br>${fileName}`;
+        label.style.borderColor = '#2563eb';
+        label.style.background = '#eff6ff';
     }
 });

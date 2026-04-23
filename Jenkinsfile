@@ -18,9 +18,9 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    sh 'pip install pytest'
+                    sh 'pip3 install pytest || python3 -m pip install pytest'
                     try {
-                        sh 'pytest tests/'
+                        sh 'pytest tests/ || python3 -m pytest tests/'
                     } catch (Exception e) {
                         echo 'No tests found or tests failed (fallback)'
                     }

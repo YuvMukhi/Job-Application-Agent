@@ -1,0 +1,12 @@
+.env
+__pycache__
+.venv
+venv
+outputs
+.DS_Store
+*.pyc
+.git
+.gitignore
+tests
+README.md
+README_DEPLOY.md

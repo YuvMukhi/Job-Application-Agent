@@ -15,3 +15,5 @@ BS Computer Science, University of Example, 2020
 
 Certifications:
 AWS Certified Developer
+
+

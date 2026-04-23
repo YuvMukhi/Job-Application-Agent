@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: career-agent
+  namespace: career-agent
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: career-agent
+  template:
+    metadata:
+      labels:
+        app: career-agent
+    spec:
+      containers:
+        - name: career-agent
+          image: devopsmlops.azurecr.io/ai-career-agent:IMAGE_TAG_PLACEHOLDER
+          ports:
+            - containerPort: 5000
+          env:
+            - name: GROQ_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: career-agent-secrets
+                  key: groq-api-key
+            - name: TAVILY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: career-agent-secrets
+                  key: tavily-api-key
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"

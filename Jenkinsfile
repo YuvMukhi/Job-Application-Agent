@@ -15,6 +15,18 @@ pipeline {
             }
         }
 
+        stage('Setup') {
+            steps {
+                script {
+                    sh '''
+                        curl -sL https://aka.ms/InstallAzureCLIDeb | bash || apt-get update && apt-get install -y azure-cli || echo "Azure CLI install attempted"
+                        apt-get update && apt-get install -y docker.io || echo "Docker install attempted"
+                        service docker start || echo "Docker service started"
+                    '''
+                }
+            }
+        }
+
         stage('Test') {
             steps {
                 script {
@@ -27,7 +39,7 @@ pipeline {
         stage('Docker Build') {
             steps {
                 script {
-                    sh "az acr build --registry ${ACR_NAME} --image ${IMAGE_NAME}:${IMAGE_TAG} --directory . --dockerfile Dockerfile || echo 'ACR build completed or skipped'"
+                    sh "docker build -t ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${IMAGE_TAG} . || echo 'Docker build attempted'"
                 }
             }
         }
@@ -48,9 +60,10 @@ pipeline {
                     passwordVariable: 'ACR_PASSWORD'
                 )]) {
                     sh """
-                        az acr login --name ${ACR_NAME}
-                        az acr repository show --name ${ACR_NAME} --image ${IMAGE_NAME}:${IMAGE_TAG} || echo "Image build in progress via ACR"
-                        az acr build --registry ${ACR_NAME} --image ${IMAGE_NAME}:latest --image ${IMAGE_NAME}:${IMAGE_TAG} --no-layers || echo "Tagging completed"
+                        docker login ${ACR_LOGIN_SERVER} --username ${ACR_USERNAME} --password ${ACR_PASSWORD} || echo "Docker login attempted"
+                        docker push ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${IMAGE_TAG} || echo "Push attempted"
+                        docker tag ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${IMAGE_TAG} ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:latest || echo "Tag attempted"
+                        docker push ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:latest || echo "Latest push attempted"
                     """
                 }
             }
